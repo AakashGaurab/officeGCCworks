@@ -16,4 +16,5 @@ export type PageParams = {
   pageSize: number;
 };
 
-export type SearchParams = PageParams & { search: string };
+// search is optional: leaving it out lists every product (used by the home page).
+export type SearchParams = PageParams & { search?: string };

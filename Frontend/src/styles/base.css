@@ -10,7 +10,7 @@ body {
   font-size: var(--font-size-base);
   color: var(--color-text);
   background: var(--color-background);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 a {
@@ -20,6 +20,7 @@ a {
 h1,
 h2 {
   margin: 0 0 var(--space-3);
+  line-height: 1.25;
 }
 
 h1 {
@@ -36,13 +37,19 @@ h2 {
 }
 
 .button {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   border: 0;
-  border-radius: var(--radius);
+  border-radius: var(--radius-pill);
   background: var(--color-primary);
   color: var(--color-primary-contrast);
   font: inherit;
+  font-weight: 600;
   cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.button:hover {
+  background: var(--color-primary-hover);
 }
 
 .visually-hidden {
@@ -56,4 +63,47 @@ h2 {
 
 .page-section {
   margin-bottom: var(--space-5);
+}
+
+/* Home page intro */
+.home-hero {
+  margin-bottom: var(--space-5);
+  padding: var(--space-5) var(--space-4);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-surface));
+  border: 1px solid var(--color-border);
+}
+
+.home-hero h1 {
+  margin-bottom: var(--space-2);
+}
+
+.home-hero-intro {
+  margin: 0;
+  max-width: 40rem;
+  color: var(--color-text-muted);
+}
+
+/* Shown under a list that has loaded everything */
+.list-end-message {
+  margin: var(--space-4) 0 0;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-3);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Category names come from the API in lowercase ("men's clothing"); show them capitalised. */
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.back-link:hover {
+  text-decoration: underline;
 }

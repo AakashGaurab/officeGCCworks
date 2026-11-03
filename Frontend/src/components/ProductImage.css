@@ -3,7 +3,9 @@
   display: block;
   width: 100%;
   aspect-ratio: 1;
+  padding: var(--space-3);
   object-fit: contain;
+  border-radius: var(--radius);
   background: var(--color-surface);
 }
 
@@ -12,5 +14,5 @@
   align-items: center;
   justify-content: center;
   color: var(--color-text-muted);
-  background: var(--color-border);
+  background: var(--color-background);
 }
