@@ -26,7 +26,7 @@ Environment variables (see `.env.example`):
 | `DATABASE_PATH` | ./data/enquiries.sqlite | SQLite file, the directory is created automatically |
 | `EMAIL_PROVIDER` | log | `log` (default) or `smtp` |
 | `SMTP_HOST`, `SMTP_PORT` (587), `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | - | Only for `EMAIL_PROVIDER=smtp` (`SMTP_HOST`, `EMAIL_FROM` and `SALES_INBOX_EMAIL` required; `SMTP_USER` and `SMTP_PASS` only together) |
-| `ADMIN_TOKEN` | not set | Enables the admin API when set (at least 16 characters, startup fails otherwise). An empty value counts as not set. See Admin API |
+| `ADMIN_TOKEN` | `123` outside production, otherwise not set | Admin API password. In production it must be set (at least 16 characters, startup fails otherwise); an empty value counts as not set. See Admin API |
 | `TRUST_PROXY` | false | Set `true` only behind a trusted proxy, see rate limiting |
 
 SQLite uses Node's built-in `node:sqlite` (Node 24+), so there is no native build step. The `data/` folder and
@@ -77,8 +77,12 @@ kept in memory, so with several instances each has its own limit (use a shared s
 
 `GET /api/admin/enquiries?status=&page=&pageSize=` lists all stored enquiries for the site owner.
 
-- **Disabled unless `ADMIN_TOKEN` is set.** Without it the route is not registered at all (404). There is no
-  built-in default password. Generate a token with `openssl rand -hex 24`.
+- **In production, disabled unless `ADMIN_TOKEN` is set.** Without it the route is not registered at all (404).
+  Generate a token with `openssl rand -hex 24`.
+- **Temporary development default:** outside production (when `NODE_ENV` is not `production`) and with no
+  `ADMIN_TOKEN`, the token is `123` and a warning is logged at startup. It is far too weak for real use, is never
+  applied in production (the Docker image sets `NODE_ENV=production`), and `DEV_ADMIN_TOKEN` in
+  `src/config/constants.ts` is the one line to delete before going live.
 - **Auth:** `Authorization: Bearer <token>`. `requireAdminToken.ts` hashes both values with SHA-256 and compares
   them with `crypto.timingSafeEqual`, so neither the length nor the content leaks through timing. Any failure
   (missing header, wrong scheme, wrong token, extra whitespace) gives the same `401 UNAUTHORIZED` with a generic message.

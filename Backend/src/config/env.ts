@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   ADMIN_TOKEN_MIN_LENGTH,
+  DEV_ADMIN_TOKEN,
   DEFAULT_CORS_ORIGIN,
   DEFAULT_DATABASE_PATH,
   DEFAULT_SALES_INBOX_EMAIL,
@@ -9,11 +10,13 @@ import {
   DEFAULT_FAKE_STORE_API_BASE_URL,
   DEFAULT_PORT,
   MAX_PORT,
+  PRODUCTION_ENV,
 } from './constants.js';
 
 const ADMIN_TOKEN_MESSAGE = `ADMIN_TOKEN must be at least ${ADMIN_TOKEN_MIN_LENGTH} characters and contain no spaces`;
 
 const baseEnvSchema = z.object({
+  NODE_ENV: z.string().optional(),
   PORT: z.coerce.number().int().positive().max(MAX_PORT).default(DEFAULT_PORT),
   FAKE_STORE_API_BASE_URL: z.string().url().default(DEFAULT_FAKE_STORE_API_BASE_URL),
   CORS_ORIGIN: z.string().min(1).default(DEFAULT_CORS_ORIGIN),
@@ -28,8 +31,8 @@ const baseEnvSchema = z.object({
   SMTP_USER: z.string().min(1).optional(),
   SMTP_PASS: z.string().min(1).optional(),
   EMAIL_FROM: z.email().optional(),
-  // Optional: without it the admin routes are not registered. docker compose passes an empty string
-  // when it is unset, so empty counts as not set. No default: a built-in password would be a backdoor.
+  // Optional: in production, without it the admin routes are not registered (docker compose passes an empty
+  // string when it is unset, so empty counts as not set). Outside production a development default applies below.
   ADMIN_TOKEN: z.preprocess(
     (value) => (value === '' ? undefined : value),
     z
@@ -54,7 +57,12 @@ const envSchema = baseEnvSchema
       context.addIssue({ code: 'custom', path: ['SMTP_PASS'], message: 'SMTP_USER and SMTP_PASS must be set together' });
     }
   })
-  .transform((env) => ({ ...env, SALES_INBOX_EMAIL: env.SALES_INBOX_EMAIL ?? DEFAULT_SALES_INBOX_EMAIL }));
+  .transform((env) => ({
+    ...env,
+    SALES_INBOX_EMAIL: env.SALES_INBOX_EMAIL ?? DEFAULT_SALES_INBOX_EMAIL,
+    // Development convenience: the weak token is never applied in production, where unset means disabled.
+    ADMIN_TOKEN: env.ADMIN_TOKEN ?? (env.NODE_ENV === PRODUCTION_ENV ? undefined : DEV_ADMIN_TOKEN),
+  }));
 
 export type Env = z.infer<typeof envSchema>;
 

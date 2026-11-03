@@ -41,9 +41,22 @@ describe('loadEnv enquiry settings', () => {
     expect(loadEnv(base).SMTP_USER).toBeUndefined();
   });
 
-  it('leaves the admin token unset by default and treats an empty string as unset', () => {
-    expect(loadEnv({}).ADMIN_TOKEN).toBeUndefined();
-    expect(loadEnv({ ADMIN_TOKEN: '' }).ADMIN_TOKEN).toBeUndefined();
+  it('leaves the admin token unset in production and treats an empty string as unset', () => {
+    expect(loadEnv({ NODE_ENV: 'production' }).ADMIN_TOKEN).toBeUndefined();
+    expect(loadEnv({ NODE_ENV: 'production', ADMIN_TOKEN: '' }).ADMIN_TOKEN).toBeUndefined();
+  });
+
+  it('uses the temporary development token outside production when none is set', () => {
+    expect(loadEnv({}).ADMIN_TOKEN).toBe('123');
+    expect(loadEnv({ NODE_ENV: 'development', ADMIN_TOKEN: '' }).ADMIN_TOKEN).toBe('123');
+  });
+
+  it('lets a real token replace the development token', () => {
+    expect(loadEnv({ ADMIN_TOKEN: 'b'.repeat(20) }).ADMIN_TOKEN).toBe('b'.repeat(20));
+  });
+
+  it('never uses the weak development token in production, even a short one set by hand', () => {
+    expect(() => loadEnv({ NODE_ENV: 'production', ADMIN_TOKEN: '123' })).toThrow(/ADMIN_TOKEN/);
   });
 
   it('rejects an admin token shorter than 16 characters', () => {

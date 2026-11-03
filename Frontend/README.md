@@ -81,7 +81,7 @@ variables used by every component stylesheet.
 ## Admin page
 
 `/admin` (`pages/AdminPage.tsx`) shows the submitted enquiries to the site owner. It is **not linked** from the
-header; the API enforces the access, a missing link is not security. The backend serves it only when `ADMIN_TOKEN`
+header; the API enforces the access, a missing link is not security. The backend serves it when `ADMIN_TOKEN` (or, outside production, the temporary development token)
 is set; otherwise sign-in shows "Admin access is not enabled on this server."
 
 - `useAdminSession` handles the token: sign in calls the API with it and keeps it only if the server accepts it

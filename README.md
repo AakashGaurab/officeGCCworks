@@ -74,7 +74,7 @@ Tests mock all HTTP calls, so none needs the network. Each project also has `npm
 |---|---|---|---|
 | `SALES_INBOX_EMAIL` | Backend | `sales@example.com` | Where enquiry emails go |
 | `EMAIL_PROVIDER` | Backend | `log` | `log` writes the email to the log. `smtp` sends it (see [Email](#email)) |
-| `ADMIN_TOKEN` | Backend | not set | Enables the `/admin` page. Leave empty to keep it disabled |
+| `ADMIN_TOKEN` | Backend | `123` outside production, otherwise not set | Password for the `/admin` page. In production it must be set (16+ characters, no spaces), or the page stays disabled |
 | `DATABASE_PATH` | Backend | `./data/enquiries.sqlite` | SQLite file location |
 | `CORS_ORIGIN` | Backend | `http://localhost:5173` | Address the web app is served from |
 | `TRUST_PROXY` | Backend | `false` | Set `true` only behind a trusted load balancer, so rate limiting sees real client IPs |
@@ -131,7 +131,7 @@ Errors always look like `{"error":{"code":"...","message":"..."}}`.
 ## Admin page (view enquiries)
 
 The site owner can read all submitted enquiries at `/admin` (for example http://localhost:5173/admin). It is
-**disabled unless `ADMIN_TOKEN` is set**, and it is not linked from the public site.
+protected by `ADMIN_TOKEN` and not linked from the public site. **Temporary:** when the backend runs outside production (`npm run dev`, or `npm start` without `NODE_ENV=production`) and no `ADMIN_TOKEN` is set, the token is the weak placeholder `123` and the server log says so. The Docker image runs in production mode, so there it stays **disabled unless `ADMIN_TOKEN` is set** to 16+ characters. Remove the placeholder (`DEV_ADMIN_TOKEN` in `Backend/src/config/constants.ts`) before any real use.
 
 1. Generate a long random token: `openssl rand -hex 24`
 2. Put it in `.env` as `ADMIN_TOKEN=<token>` (root `.env` for Docker, `Backend/.env` for local development).
