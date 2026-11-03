@@ -5,7 +5,6 @@ import { RoutePath } from '../constants/Routes';
 import { makeCategoryListing } from '../test/fixtures';
 import { installIntersectionObserver, triggerIntersection } from '../test/mockIntersectionObserver';
 import { renderAtRoute } from '../test/renderWithRouter';
-import { act } from '@testing-library/react';
 import CategoryPage from './CategoryPage';
 
 vi.mock('../api/catalogueApi');
@@ -30,7 +29,7 @@ describe('CategoryPage', () => {
     );
     expect(screen.getAllByRole('article')).toHaveLength(4);
 
-    act(() => triggerIntersection());
+    await triggerIntersection();
     expect(await screen.findByText('Product 5')).toBeInTheDocument();
     expect(screen.getAllByRole('article')).toHaveLength(5);
   });

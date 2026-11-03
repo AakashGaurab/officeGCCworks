@@ -1,5 +1,6 @@
 export enum ErrorCode {
   VALIDATION_ERROR = 'VALIDATION_ERROR',
+  UNAUTHORIZED = 'UNAUTHORIZED',
   NOT_FOUND = 'NOT_FOUND',
   UPSTREAM_ERROR = 'UPSTREAM_ERROR',
   RATE_LIMITED = 'RATE_LIMITED',
@@ -8,8 +9,9 @@ export enum ErrorCode {
 
 export enum ErrorMessage {
   VALIDATION = 'Invalid request',
+  UNAUTHORIZED = 'Authentication required',
   ROUTE_NOT_FOUND = 'Route not found',
   UPSTREAM = 'The product service is currently unavailable',
-  RATE_LIMITED = 'Too many enquiries, please try again in a minute',
+  RATE_LIMITED = 'Too many requests, please try again in a minute',
   INTERNAL = 'Something went wrong',
 }

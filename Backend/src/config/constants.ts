@@ -51,6 +51,19 @@ export const ENQUIRY_RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 export const MAX_STORED_ERROR_LENGTH = 200;
 
+// Admin area. The shared token must be long enough that guessing it is not realistic.
+export const ADMIN_TOKEN_MIN_LENGTH = 16;
+// TEMPORARY, for local development only: used when ADMIN_TOKEN is not set and NODE_ENV is not "production".
+// It is far too weak for a real deployment, so production never uses it. Remove it before going live.
+export const DEV_ADMIN_TOKEN = '123';
+export const PRODUCTION_ENV = 'production';
+export const ADMIN_DEFAULT_PAGE_SIZE = 20;
+export const ADMIN_MAX_PAGE_SIZE = 100;
+// Every admin request counts, not only failed ones: simple, and it still stops token guessing.
+// 30 leaves room for an owner clicking through tabs; guessing a 16+ character token at 30 a minute is hopeless.
+export const ADMIN_RATE_LIMIT_MAX = 30;
+export const ADMIN_RATE_LIMIT_WINDOW_MS = 60 * 1000;
+
 export enum UpstreamPath {
   PRODUCTS = '/products',
 }
@@ -59,6 +72,7 @@ export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
   BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
   NOT_FOUND: 404,
   TOO_MANY_REQUESTS: 429,
   INTERNAL_SERVER_ERROR: 500,

@@ -19,6 +19,14 @@ describe('apiGet', () => {
     expect(mockFetch.mock.calls[0]?.[0]).toMatch(/\/x\?page=2$/);
   });
 
+  it('sends the given request headers', async () => {
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
+
+    await apiGet('/x', { headers: { Authorization: 'Bearer abc' } });
+
+    expect(mockFetch.mock.calls[0]?.[1]).toMatchObject({ headers: { Authorization: 'Bearer abc' } });
+  });
+
   it('throws an ApiError with the backend code and message', async () => {
     mockFetch.mockResolvedValue({
       ok: false,

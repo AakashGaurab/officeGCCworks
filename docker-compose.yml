@@ -14,6 +14,8 @@ services:
       SALES_INBOX_EMAIL: ${SALES_INBOX_EMAIL:-sales@example.com}
       # log = write the email to the container log (no paid service needed).
       EMAIL_PROVIDER: ${EMAIL_PROVIDER:-log}
+      # Empty = admin page disabled. Set a long random value in .env to enable it.
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
       DATABASE_PATH: /app/data/enquiries.sqlite
     volumes:
       # Keeps saved enquiries when the container is recreated.

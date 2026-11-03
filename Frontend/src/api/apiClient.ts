@@ -15,6 +15,7 @@ type QueryParams = Record<string, string | number | undefined>;
 
 type GetOptions = {
   params?: QueryParams;
+  headers?: Record<string, string>;
   signal?: AbortSignal;
 };
 
@@ -60,8 +61,8 @@ const request = async <T>(url: string, init: RequestInit): Promise<T> => {
   return (await response.json()) as T;
 };
 
-export const apiGet = <T>(path: string, { params, signal }: GetOptions = {}): Promise<T> =>
-  request<T>(`${API_BASE_URL}${path}${buildQueryString(params)}`, { signal });
+export const apiGet = <T>(path: string, { params, headers, signal }: GetOptions = {}): Promise<T> =>
+  request<T>(`${API_BASE_URL}${path}${buildQueryString(params)}`, { headers, signal });
 
 // Cancels the request after POST_TIMEOUT_MS, or earlier when the caller's signal aborts.
 // A timeout becomes a friendly ApiError; a caller abort stays an AbortError so callers can ignore it.
