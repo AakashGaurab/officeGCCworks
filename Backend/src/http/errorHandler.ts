@@ -24,6 +24,9 @@ export const errorHandler = (error: FastifyError, request: FastifyRequest, reply
     request.log.error(error);
     return sendError(reply, HTTP_STATUS.BAD_GATEWAY, ErrorCode.UPSTREAM_ERROR, ErrorMessage.UPSTREAM);
   }
+  if (error.statusCode === HTTP_STATUS.TOO_MANY_REQUESTS) {
+    return sendError(reply, HTTP_STATUS.TOO_MANY_REQUESTS, ErrorCode.RATE_LIMITED, ErrorMessage.RATE_LIMITED);
+  }
   // Client mistakes raised by Fastify itself (e.g. malformed JSON).
   if (error.statusCode && error.statusCode < HTTP_STATUS.INTERNAL_SERVER_ERROR) {
     return sendError(reply, HTTP_STATUS.BAD_REQUEST, ErrorCode.VALIDATION_ERROR, ErrorMessage.VALIDATION);

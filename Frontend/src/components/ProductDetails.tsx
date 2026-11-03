@@ -1,6 +1,7 @@
 import { ProductText } from '../constants/Text';
 import type { Product } from '../types/Product';
 import { formatPrice } from '../utils/formatPrice';
+import EnquirySection from './EnquirySection';
 import PageTitle from './PageTitle';
 import ProductImage from './ProductImage';
 import StarRating from './StarRating';
@@ -24,7 +25,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => (
       <StarRating rating={product.rating} />
       <h2>{ProductText.DESCRIPTION}</h2>
       <p>{product.description}</p>
-      {/* The Enquire action will be added here in a later change. */}
+      <EnquirySection product={product} />
     </div>
   </article>
 );

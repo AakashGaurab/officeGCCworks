@@ -1,4 +1,13 @@
-import { ABORT_ERROR_NAME, DEFAULT_API_BASE_URL, NETWORK_ERROR_STATUS } from '../constants/AppConstants';
+import {
+  ABORT_ERROR_NAME,
+  DEFAULT_API_BASE_URL,
+  HttpMethod,
+  JSON_CONTENT_TYPE,
+  JSON_CONTENT_TYPE_HEADER,
+  NETWORK_ERROR_STATUS,
+  POST_TIMEOUT_MS,
+  TIMEOUT_ERROR_STATUS,
+} from '../constants/AppConstants';
 import { ApiErrorText } from '../constants/Text';
 import { ApiError } from './ApiError';
 
@@ -6,6 +15,10 @@ type QueryParams = Record<string, string | number | undefined>;
 
 type GetOptions = {
   params?: QueryParams;
+  signal?: AbortSignal;
+};
+
+type PostOptions = {
   signal?: AbortSignal;
 };
 
@@ -34,10 +47,10 @@ const toApiError = async (response: Response): Promise<ApiError> => {
 const isAbortError = (error: unknown): boolean =>
   error instanceof DOMException && error.name === ABORT_ERROR_NAME;
 
-export const apiGet = async <T>(path: string, { params, signal }: GetOptions = {}): Promise<T> => {
+const request = async <T>(url: string, init: RequestInit): Promise<T> => {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}${buildQueryString(params)}`, { signal });
+    response = await fetch(url, init);
   } catch (error) {
     // Aborts are expected (navigation); let callers see them untouched so they can ignore them.
     if (isAbortError(error)) throw error;
@@ -45,4 +58,36 @@ export const apiGet = async <T>(path: string, { params, signal }: GetOptions = {
   }
   if (!response.ok) throw await toApiError(response);
   return (await response.json()) as T;
+};
+
+export const apiGet = <T>(path: string, { params, signal }: GetOptions = {}): Promise<T> =>
+  request<T>(`${API_BASE_URL}${path}${buildQueryString(params)}`, { signal });
+
+// Cancels the request after POST_TIMEOUT_MS, or earlier when the caller's signal aborts.
+// A timeout becomes a friendly ApiError; a caller abort stays an AbortError so callers can ignore it.
+export const apiPost = async <T>(path: string, body: unknown, { signal }: PostOptions = {}): Promise<T> => {
+  const controller = new AbortController();
+  let isTimedOut = false;
+  const timeoutId = setTimeout(() => {
+    isTimedOut = true;
+    controller.abort();
+  }, POST_TIMEOUT_MS);
+  const handleCallerAbort = () => controller.abort();
+  if (signal?.aborted) controller.abort();
+  signal?.addEventListener('abort', handleCallerAbort);
+
+  try {
+    return await request<T>(`${API_BASE_URL}${path}`, {
+      method: HttpMethod.POST,
+      headers: { [JSON_CONTENT_TYPE_HEADER]: JSON_CONTENT_TYPE },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (isTimedOut) throw new ApiError(TIMEOUT_ERROR_STATUS, ApiErrorText.TIMEOUT_CODE, ApiErrorText.TIMEOUT);
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+    signal?.removeEventListener('abort', handleCallerAbort);
+  }
 };
