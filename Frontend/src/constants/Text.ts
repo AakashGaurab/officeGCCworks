@@ -7,6 +7,7 @@ export enum CommonText {
   MAIN_NAV_LABEL = 'Categories',
   SKIP_TO_CONTENT = 'Skip to content',
   TITLE_SEPARATOR = ' | ',
+  ALL_PRODUCTS_LINK = 'All products',
 }
 
 export enum HeaderText {
@@ -30,8 +31,14 @@ export enum EmptyText {
 }
 
 export enum HomeText {
-  PAGE_TITLE = 'Welcome',
+  PAGE_TITLE = 'Discover our products',
+  INTRO = 'Browse the catalogue, search for what you need, and send us an enquiry.',
   TOP_RATED = 'Top rated',
+  ALL_PRODUCTS = 'All products',
+}
+
+export enum ListText {
+  END_OF_LIST = "You've reached the end of the list",
 }
 
 export enum CategoryText {
@@ -56,6 +63,7 @@ export enum ProductText {
   DESCRIPTION = 'Description',
   CATEGORY = 'Category',
   IMAGE_UNAVAILABLE = 'Image unavailable',
+  BACK_TO = 'Back to',
 }
 
 export enum RatingText {

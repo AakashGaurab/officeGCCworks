@@ -7,6 +7,7 @@ type LoadingStateProps = {
 
 const LoadingState = ({ label = CommonText.LOADING }: LoadingStateProps) => (
   <div className="state-message" role="status">
+    <div className="loading-spinner" aria-hidden="true" />
     {label}
   </div>
 );

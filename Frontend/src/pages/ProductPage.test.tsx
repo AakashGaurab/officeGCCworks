@@ -26,6 +26,14 @@ describe('ProductPage', () => {
     expect(screen.getByLabelText(/Rated 4.5 out of 5, 100 reviews/)).toBeInTheDocument();
   });
 
+  it("links back to the product's category", async () => {
+    vi.mocked(catalogueApi.getProductById).mockResolvedValue(makeProduct(7));
+    renderProduct();
+
+    const backLink = await screen.findByRole('link', { name: /Back to men's clothing/ });
+    expect(backLink).toHaveAttribute('href', "/category/men's%20clothing");
+  });
+
   it('shows a heading while loading', () => {
     vi.mocked(catalogueApi.getProductById).mockReturnValue(new Promise(() => {}));
     renderProduct();

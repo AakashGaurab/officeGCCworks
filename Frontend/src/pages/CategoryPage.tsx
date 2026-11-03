@@ -29,12 +29,12 @@ const CategoryPage = () => {
     return (
       <>
         <section className="page-section">
-          <h2>{buildTopRatedTitle(category)}</h2>
+          <h2 className="text-capitalize">{buildTopRatedTitle(category)}</h2>
           <ProductGrid products={topRated} />
         </section>
         {products.items.length > 0 && (
           <section className="page-section">
-            <h2>{buildMoreInTitle(category)}</h2>
+            <h2 className="text-capitalize">{buildMoreInTitle(category)}</h2>
             <InfiniteProductList
               products={products.items}
               isLoadingMore={products.isLoadingMore}
@@ -51,7 +51,9 @@ const CategoryPage = () => {
 
   return (
     <>
-      <PageTitle title={category} />
+      <div className="text-capitalize">
+        <PageTitle title={category} />
+      </div>
       {renderContent()}
     </>
   );

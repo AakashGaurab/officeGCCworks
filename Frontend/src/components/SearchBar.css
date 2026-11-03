@@ -7,8 +7,14 @@
 
 .search-bar-input {
   flex: 1;
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-pill);
+  background: var(--color-background);
   font: inherit;
+}
+
+.search-bar-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
 }
