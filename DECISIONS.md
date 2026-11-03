@@ -14,16 +14,18 @@
 | Currency and language | Prices in US dollars, English only. Fake Store gives no currency, so USD is a constant |
 | Empty and failing data | Every list has an empty state and an error state with Retry. A failed API call never leaves a blank page |
 | Anonymous use | No login, no accounts, no basket. The brief only asks to browse and enquire |
+| Seeing the enquiries | The brief says the sales inbox receives an email, but no email service is allowed. So the owner can read every saved enquiry on a small admin page (`/admin`), protected by a shared `ADMIN_TOKEN` |
+| Categories with few products | Fake Store has only 20 products (4 to 6 per category). A category with 4 or fewer products shows its "Top rated" products and no "More" section, because there are no additional ones |
 
 ## Requirements simplified or dropped
 
 | What | Why |
 |---|---|
 | Real email delivery | Providers cost money and the reviewer must not need an account. Built and unit-tested with a mocked transport, but not run against a real mail server |
-| Choosing the "top rated" products | No admin tool was asked for. Rating decides |
+| Choosing the "top rated" products | The admin page only lists enquiries; it cannot pick featured products. Rating decides |
 | Retry job for unsent enquiries | The data is kept and `findUnsent()` exists, but no job runs. Skipped to stay in the time-box |
 | Deployment to AWS | Not asked for. Documented in the README only |
-| Authentication, admin screens, analytics | Out of scope for the proof of concept |
+| User accounts, sign-in for customers, analytics | Out of scope for the proof of concept |
 | Per-field server error messages in the form | The client validates the same rules first, so a server rejection is rare. It shows one general message |
 | Browser (end-to-end) tests | Backend and front end are covered by unit, component and HTTP tests. No Playwright suite |
 | Docker config tested on the build machine | Docker was not installed where this was built, so the compose setup was written carefully but first run by the owner |
@@ -34,7 +36,7 @@
 - **Swappable storage and email.** `EnquiryRepository` and `EmailSender` work the same way. Moving to Postgres or SES does not touch the enquiry logic.
 - **Clear boundaries.** The browser never calls the product source. The backend layers (`http`, `application`, `domain`, `infrastructure`) only depend inwards, so business rules can be tested with in-memory fakes.
 - **Replaceable look and feel.** Colours, spacing and type are CSS variables in one file. Presentational components do not fetch data, so a redesign does not touch data code.
-- **Safe to change.** 240 tests cover the critical paths, including failure cases (upstream down, email failing, invalid input).
+- **Safe to change.** 349 tests (177 backend, 172 frontend) cover the critical paths, including failure cases (upstream down, email failing, invalid input).
 - **Deployable.** Both services are Docker images, configured only by environment variables.
 
 ## Security basics included
@@ -48,6 +50,9 @@
 
 ## Trade-offs worth knowing
 
+- **Temporary admin token for development.** Outside production, with no `ADMIN_TOKEN` set, the admin token is the weak placeholder `123` (the server logs a warning). It is never used in production or in the Docker image, where an unset token means the admin page is disabled and a set token needs 16+ characters. It is one constant (`DEV_ADMIN_TOKEN`) to delete before any real use.
+- **Admin access is one shared token.** No per-person login or audit trail, and it needs HTTPS in production. The next step is real sign-in (for example Cognito or company SSO on AWS).
+
 - **`node:sqlite`** is built into Node 24 and needs no native build, but Node still marks it experimental. The interface makes it a one-file change to replace.
 - **The honeypot field** is called `website`, which browsers can autofill. A real person whose browser fills it would see "Thank you" while the enquiry is silently dropped. The server logs a warning when this happens. A less autofill-prone name would be safer.
 - **The rate limit** is in memory, per instance. Behind a load balancer it needs `TRUST_PROXY=true` and, at scale, a shared store.
@@ -58,8 +63,9 @@
 
 1. Run the Docker setup end to end on a clean machine and fix anything it shows.
 2. Add the retry job for unsent enquiries.
-3. Add a browser test (Playwright) for browse, search and enquire.
+3. Add a browser test (Playwright) for browse, search, enquire and the admin page.
 4. Replace SQLite with Postgres, and the log email sender with SES, then deploy to a test AWS account.
 5. Let the owner choose the featured products (a small admin setting) instead of ranking by rating.
 6. Add accessibility checks to the tests and a pass with a screen reader.
+   Replace the shared admin token with real sign-in and remove `DEV_ADMIN_TOKEN`.
 7. Add server-side field errors to the form and an analytics event for submitted enquiries.

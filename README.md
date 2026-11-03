@@ -62,8 +62,8 @@ npm run dev
 ### Run the tests
 
 ```bash
-cd Backend && npm test      # 135 tests
-cd Frontend && npm test     # 105 tests
+cd Backend && npm test      # 177 tests
+cd Frontend && npm test     # 172 tests
 ```
 
 Tests mock all HTTP calls, so none needs the network. Each project also has `npm run typecheck`, `npm run lint` and `npm run build`.
