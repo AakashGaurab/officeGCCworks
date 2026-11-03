@@ -19,7 +19,7 @@ I set up a small team of five AI agents, each with one job and its own instructi
 | `reviewer` | Read-only. Check the code against the standards and the spec, and look for regressions |
 | `pr-creator` | Branch from the latest `main` and open the pull request |
 
-The brief was a PDF, so I skipped `doc-reader` and handed the PDF over directly. For each feature the loop was: coder builds, reviewer reviews and runs the checks, coder fixes the findings, I re-run the checks, then a pull request. I merged each pull request myself before the next feature started. There were seven pull requests, each merged by me before the next started: (1) backend API, (2) front-end browsing, (3) enquiry flow, (4) Docker setup and documentation, (5) design refresh, selected-category highlight and infinite scroll on the home page, (6) the enquiry form as an animated modal, and (7) a protected admin page for reading enquiries. PRs 5 to 7 came from my own feedback after trying the running app.
+The brief was a PDF, so I skipped `doc-reader` and handed the PDF over directly. For each feature the loop was: coder builds, reviewer reviews and runs the checks, coder fixes the findings, I re-run the checks, then a pull request. There were seven pull requests, each merged by me before the next started: (1) backend API, (2) front-end browsing, (3) enquiry flow, (4) Docker setup and documentation, (5) design refresh, selected-category highlight and infinite scroll on the home page, (6) the enquiry form as an animated modal, and (7) a protected admin page for reading enquiries. PRs 5 to 7 came from my own feedback after trying the running app.
 
 ## Agent instruction files (committed)
 
