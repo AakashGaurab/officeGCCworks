@@ -40,4 +40,23 @@ describe('loadEnv enquiry settings', () => {
     expect(loadEnv({ ...base, SMTP_USER: 'user', SMTP_PASS: 'secret' })).toMatchObject({ SMTP_USER: 'user' });
     expect(loadEnv(base).SMTP_USER).toBeUndefined();
   });
+
+  it('leaves the admin token unset by default and treats an empty string as unset', () => {
+    expect(loadEnv({}).ADMIN_TOKEN).toBeUndefined();
+    expect(loadEnv({ ADMIN_TOKEN: '' }).ADMIN_TOKEN).toBeUndefined();
+  });
+
+  it('rejects an admin token shorter than 16 characters', () => {
+    expect(() => loadEnv({ ADMIN_TOKEN: 'short' })).toThrow(/ADMIN_TOKEN/);
+    expect(loadEnv({ ADMIN_TOKEN: 'a'.repeat(16) }).ADMIN_TOKEN).toBe('a'.repeat(16));
+  });
+
+  it.each([
+    ['leading', ` ${'a'.repeat(16)}`],
+    ['trailing', `${'a'.repeat(16)} `],
+    ['inner', `${'a'.repeat(8)} ${'a'.repeat(8)}`],
+    ['only spaces', ' '.repeat(16)],
+  ])('rejects an admin token with %s whitespace', (_name, token) => {
+    expect(() => loadEnv({ ADMIN_TOKEN: token })).toThrow(/at least 16 characters and contain no spaces/);
+  });
 });

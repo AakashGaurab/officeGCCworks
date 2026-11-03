@@ -135,3 +135,50 @@ export enum EnquiryLimitTemplate {
   PHONE_LENGTH = 'A phone number must have {min} to {max} characters.',
   MESSAGE_TOO_LONG = 'Your message must be {max} characters or fewer.',
 }
+
+export enum AdminText {
+  PAGE_TITLE = 'Admin',
+  LIST_HEADING = 'Enquiries',
+  TOKEN_LABEL = 'Admin token',
+  SIGN_IN = 'Sign in',
+  SIGNING_IN = 'Signing in...',
+  SIGN_OUT = 'Sign out',
+  REFRESH = 'Refresh',
+  LOAD_MORE = 'Load more',
+  TABS_LABEL = 'Filter by status',
+  SENT_NOTE = 'Sent means the email sender accepted the message. With the default log sender nothing is actually emailed.',
+  TABLE_CAPTION = 'Submitted enquiries',
+  NO_PHONE = '-',
+  VIEW_MESSAGE = 'View message',
+  SEND_ERROR_PREFIX = 'Send error:',
+  EMPTY_ALL_TITLE = 'No enquiries yet',
+  EMPTY_ALL_MESSAGE = 'Enquiries sent from product pages will appear here.',
+  EMPTY_FILTERED_TITLE = 'No enquiries with this status',
+  EMPTY_FILTERED_MESSAGE = 'Pick another status to see more.',
+}
+
+export enum AdminFilterText {
+  ALL = 'All',
+  PENDING = 'Pending',
+  SENT = 'Sent',
+  FAILED = 'Failed',
+}
+
+export enum AdminColumnText {
+  DATE = 'Date',
+  PRODUCT = 'Product',
+  NAME = 'Name',
+  EMAIL = 'Email',
+  PHONE = 'Phone',
+  STATUS = 'Status',
+  MESSAGE = 'Message',
+}
+
+export enum AdminLoginErrorText {
+  TOKEN_REQUIRED = 'Enter the admin token.',
+  INVALID_TOKEN = 'That token is not correct.',
+  RATE_LIMITED = 'Too many attempts. Try again in a minute.',
+  DISABLED = 'Admin access is not enabled on this server.',
+  FAILED = 'We could not sign you in. Check your connection and try again.',
+  SESSION_EXPIRED = 'You were signed out because the token is no longer accepted. Please sign in again.',
+}

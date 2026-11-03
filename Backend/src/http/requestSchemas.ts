@@ -1,5 +1,8 @@
 import { z } from 'zod';
+import { EnquiryStatus } from '../domain/Enquiry.js';
 import {
+  ADMIN_DEFAULT_PAGE_SIZE,
+  ADMIN_MAX_PAGE_SIZE,
   DEFAULT_PAGE,
   CONTROL_CHARACTER_PATTERN,
   DEFAULT_PAGE_SIZE,
@@ -51,4 +54,11 @@ export const enquiryBodySchema = z.object({
   message: z.string().trim().min(1).max(ENQUIRY_MESSAGE_MAX_LENGTH),
   // Honeypot: hidden in the form, so only bots fill it in.
   website: z.string().max(ENQUIRY_HONEYPOT_MAX_LENGTH).optional(),
+});
+
+// Unlike the public listings, an oversized pageSize is rejected here (400) instead of clamped.
+export const adminEnquiriesQuerySchema = z.object({
+  status: z.enum(EnquiryStatus).optional(),
+  page: positiveInt.default(DEFAULT_PAGE),
+  pageSize: positiveInt.max(ADMIN_MAX_PAGE_SIZE).default(ADMIN_DEFAULT_PAGE_SIZE),
 });

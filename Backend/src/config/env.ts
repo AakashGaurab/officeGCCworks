@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  ADMIN_TOKEN_MIN_LENGTH,
   DEFAULT_CORS_ORIGIN,
   DEFAULT_DATABASE_PATH,
   DEFAULT_SALES_INBOX_EMAIL,
@@ -9,6 +10,8 @@ import {
   DEFAULT_PORT,
   MAX_PORT,
 } from './constants.js';
+
+const ADMIN_TOKEN_MESSAGE = `ADMIN_TOKEN must be at least ${ADMIN_TOKEN_MIN_LENGTH} characters and contain no spaces`;
 
 const baseEnvSchema = z.object({
   PORT: z.coerce.number().int().positive().max(MAX_PORT).default(DEFAULT_PORT),
@@ -25,6 +28,17 @@ const baseEnvSchema = z.object({
   SMTP_USER: z.string().min(1).optional(),
   SMTP_PASS: z.string().min(1).optional(),
   EMAIL_FROM: z.email().optional(),
+  // Optional: without it the admin routes are not registered. docker compose passes an empty string
+  // when it is unset, so empty counts as not set. No default: a built-in password would be a backdoor.
+  ADMIN_TOKEN: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z
+      .string()
+      .min(ADMIN_TOKEN_MIN_LENGTH, ADMIN_TOKEN_MESSAGE)
+      // Whitespace is almost always a paste mistake and would never match a trimmed header value.
+      .regex(/^\S+$/, ADMIN_TOKEN_MESSAGE)
+      .optional(),
+  ),
 });
 
 // The SMTP settings are only mandatory when the SMTP provider is selected.

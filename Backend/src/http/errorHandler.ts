@@ -1,6 +1,7 @@
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
 import { HTTP_STATUS } from '../config/constants.js';
+import { UnauthorizedError } from '../domain/UnauthorizedError.js';
 import { NotFoundError } from '../domain/NotFoundError.js';
 import { UpstreamError } from '../domain/UpstreamError.js';
 import { ErrorCode, ErrorMessage } from './ErrorCode.js';
@@ -16,6 +17,9 @@ export const errorHandler = (error: FastifyError, request: FastifyRequest, reply
   if (error instanceof ZodError) {
     const message = error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join('; ');
     return sendError(reply, HTTP_STATUS.BAD_REQUEST, ErrorCode.VALIDATION_ERROR, message);
+  }
+  if (error instanceof UnauthorizedError) {
+    return sendError(reply, HTTP_STATUS.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, ErrorMessage.UNAUTHORIZED);
   }
   if (error instanceof NotFoundError) {
     return sendError(reply, HTTP_STATUS.NOT_FOUND, ErrorCode.NOT_FOUND, error.message);

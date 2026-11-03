@@ -26,6 +26,7 @@ Environment variables (see `.env.example`):
 | `DATABASE_PATH` | ./data/enquiries.sqlite | SQLite file, the directory is created automatically |
 | `EMAIL_PROVIDER` | log | `log` (default) or `smtp` |
 | `SMTP_HOST`, `SMTP_PORT` (587), `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | - | Only for `EMAIL_PROVIDER=smtp` (`SMTP_HOST`, `EMAIL_FROM` and `SALES_INBOX_EMAIL` required; `SMTP_USER` and `SMTP_PASS` only together) |
+| `ADMIN_TOKEN` | not set | Enables the admin API when set (at least 16 characters, startup fails otherwise). An empty value counts as not set. See Admin API |
 | `TRUST_PROXY` | false | Set `true` only behind a trusted proxy, see rate limiting |
 
 SQLite uses Node's built-in `node:sqlite` (Node 24+), so there is no native build step. The `data/` folder and
@@ -72,6 +73,27 @@ load balancer every request appears to come from the proxy's IP unless `TRUST_PR
 when a trusted proxy sets `X-Forwarded-For`, otherwise clients could fake their address. The counter is
 kept in memory, so with several instances each has its own limit (use a shared store such as Redis then).
 
+## Admin API (disabled by default)
+
+`GET /api/admin/enquiries?status=&page=&pageSize=` lists all stored enquiries for the site owner.
+
+- **Disabled unless `ADMIN_TOKEN` is set.** Without it the route is not registered at all (404). There is no
+  built-in default password. Generate a token with `openssl rand -hex 24`.
+- **Auth:** `Authorization: Bearer <token>`. `requireAdminToken.ts` hashes both values with SHA-256 and compares
+  them with `crypto.timingSafeEqual`, so neither the length nor the content leaks through timing. Any failure
+  (missing header, wrong scheme, wrong token, extra whitespace) gives the same `401 UNAUTHORIZED` with a generic message.
+  Future admin routes are protected by registering them inside `registerAdminRoutes` (the hook applies to the whole scope).
+- **Logging:** the token and the `Authorization` header are never logged. Fastify's default request log only
+  records method, url, host and remote address; a test checks this.
+- **Brute force:** 30 requests per minute per IP on the admin routes (429 `RATE_LIMITED`). Same `TRUST_PROXY` caveat as above.
+- **Caching:** admin responses send `Cache-Control: no-store` because they contain personal data.
+- **Query:** `status` (`pending`, `sent`, `failed`, optional), `page` (default 1), `pageSize` (default 20, max 100,
+  larger values are a 400). Newest first.
+- **Response:** `{ items, page, pageSize, total, hasNextPage, statusCounts: { pending, sent, failed } }`.
+  `statusCounts` covers all enquiries regardless of the `status` filter, so a UI can show counts on its tabs.
+
+`EnquiryRepository` has two read methods for this: `findPage` and `countByStatus` (indexed on `created_at`).
+
 Ordering is always rating desc, then rating count desc, then id asc, so results are stable.
 
 Errors share one shape: `{ "error": { "code": "...", "message": "..." } }` with status 400 (validation),
@@ -114,7 +136,7 @@ cannot hang the request). For another provider (for example SES on AWS):
 2. Return it from `createEmailSender` in `src/infrastructure/createEmailSender.ts`, the one swap point.
 
 To replace SQLite (for example with Postgres on RDS) implement `EnquiryRepository` (`save`, `markSent`,
-`markFailed`, `findUnsent`, `close`) and pass it as `enquiryRepository` in `src/server.ts`. The app closes it
+`markFailed`, `findUnsent`, `findPage`, `countByStatus`, `close`) and pass it as `enquiryRepository` in `src/server.ts`. The app closes it
 on shutdown.
 
 ## Next step: retry failed emails

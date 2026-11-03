@@ -1,3 +1,4 @@
+import { act, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
 type ObserverCallback = (entries: { isIntersecting: boolean }[]) => void;
@@ -18,4 +19,9 @@ export const installIntersectionObserver = () => {
 };
 
 // Pretends the sentinel scrolled into view for the most recently created observer.
-export const triggerIntersection = () => callbacks.at(-1)?.([{ isIntersecting: true }]);
+// The sentinel can be in the DOM before React has run the effect that creates the observer (effects of
+// a promise-driven render run after the commit), so wait for the observer instead of firing into nothing.
+export const triggerIntersection = async () => {
+  await waitFor(() => expect(callbacks.length).toBeGreaterThan(0));
+  act(() => callbacks.at(-1)?.([{ isIntersecting: true }]));
+};

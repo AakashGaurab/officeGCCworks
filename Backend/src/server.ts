@@ -13,6 +13,7 @@ const app = await buildApp({
   createEmailSender: (logger) => createEmailSender(env, logger),
   salesInboxEmail: env.SALES_INBOX_EMAIL,
   corsOrigin: env.CORS_ORIGIN,
+  adminToken: env.ADMIN_TOKEN,
   trustProxy: env.TRUST_PROXY,
   logger: true,
 });

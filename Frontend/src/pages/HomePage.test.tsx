@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import * as catalogueApi from '../api/catalogueApi';
@@ -49,7 +49,7 @@ describe('HomePage', () => {
     expect(await getSection('All products').findAllByRole('article')).toHaveLength(2);
     expect(screen.queryByText("You've reached the end of the list")).not.toBeInTheDocument();
 
-    act(() => triggerIntersection());
+    await triggerIntersection();
 
     expect(await screen.findByText('Product 8')).toBeInTheDocument();
     expect(getSection('All products').getAllByRole('article')).toHaveLength(3);

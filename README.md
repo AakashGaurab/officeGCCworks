@@ -74,6 +74,7 @@ Tests mock all HTTP calls, so none needs the network. Each project also has `npm
 |---|---|---|---|
 | `SALES_INBOX_EMAIL` | Backend | `sales@example.com` | Where enquiry emails go |
 | `EMAIL_PROVIDER` | Backend | `log` | `log` writes the email to the log. `smtp` sends it (see [Email](#email)) |
+| `ADMIN_TOKEN` | Backend | not set | Enables the `/admin` page. Leave empty to keep it disabled |
 | `DATABASE_PATH` | Backend | `./data/enquiries.sqlite` | SQLite file location |
 | `CORS_ORIGIN` | Backend | `http://localhost:5173` | Address the web app is served from |
 | `TRUST_PROXY` | Backend | `false` | Set `true` only behind a trusted load balancer, so rate limiting sees real client IPs |
@@ -126,6 +127,27 @@ More detail: [Backend/README.md](Backend/README.md), [Frontend/README.md](Fronte
 | `POST /api/enquiries` | Submit an enquiry |
 
 Errors always look like `{"error":{"code":"...","message":"..."}}`.
+
+## Admin page (view enquiries)
+
+The site owner can read all submitted enquiries at `/admin` (for example http://localhost:5173/admin). It is
+**disabled unless `ADMIN_TOKEN` is set**, and it is not linked from the public site.
+
+1. Generate a long random token: `openssl rand -hex 24`
+2. Put it in `.env` as `ADMIN_TOKEN=<token>` (root `.env` for Docker, `Backend/.env` for local development).
+3. Restart the backend (`docker compose up --build`), open `/admin`, enter the token and press Sign in.
+
+If the page says "Admin access is not enabled on this server", `ADMIN_TOKEN` is not set on the backend.
+The page lists enquiries newest first with status filters, counts and "Load more". "Sent" means the email
+sender accepted the message; with the default `log` sender nothing is actually emailed.
+
+Security notes:
+- It is one **shared token**, not user accounts. Anyone with the token can read every enquiry, and there is no per-user audit trail.
+- The token travels in an `Authorization` header, so **use HTTPS in production**. Over plain HTTP it can be read on the network.
+- The browser keeps the token in `sessionStorage` until the tab is closed or you press Sign out. Any script running on the page could read it,
+  which is why the site renders customer text as plain text only.
+- Failed and repeated attempts are rate limited per IP, and admin responses are never cached.
+- Next step for a real deployment: proper sign-in with Amazon Cognito or the company SSO (OIDC) and per-user audit logs on AWS.
 
 ## Email
 

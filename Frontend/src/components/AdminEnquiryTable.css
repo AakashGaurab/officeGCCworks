@@ -1,0 +1,42 @@
+.admin-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 52rem;
+  border-collapse: collapse;
+  font-size: var(--font-size-small);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-table th {
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.admin-table-muted {
+  color: var(--color-text-muted);
+}
+
+/* Long messages are shown in full: keep line breaks and break very long words. */
+.admin-message {
+  max-width: 28rem;
+  margin: var(--space-2) 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.admin-message-error {
+  color: var(--color-danger);
+}

@@ -78,6 +78,23 @@ Each component has its own `.css` file next to it, using only the variables from
 Edit only `src/styles/theme.css`: colours, fonts, spacing, radius, shadow and the focus ring are CSS
 variables used by every component stylesheet.
 
+## Admin page
+
+`/admin` (`pages/AdminPage.tsx`) shows the submitted enquiries to the site owner. It is **not linked** from the
+header; the API enforces the access, a missing link is not security. The backend serves it only when `ADMIN_TOKEN`
+is set; otherwise sign-in shows "Admin access is not enabled on this server."
+
+- `useAdminSession` handles the token: sign in calls the API with it and keeps it only if the server accepts it
+  (React state plus `sessionStorage`, cleared when the tab closes or on Sign out). Storage access is wrapped in
+  try/catch (`utils/adminTokenStorage.ts`). The token is sent in an `Authorization` header, never in a URL, and never logged.
+  Messages: 401 "That token is not correct.", 429 "Too many attempts...", 404 admin disabled, other errors a friendly retry message.
+- `useAdminEnquiries` loads pages (20 at a time, "Load more" appends), restarts when the status filter changes or
+  on Refresh, ignores outdated answers, and tells the page to sign out when a later request returns 401.
+- The table scrolls sideways on small screens. Status is a text badge (colour is extra). Customer text is rendered
+  as text only (never as HTML) and the email link is encoded with `encodeURIComponent`.
+- Trade-off: `sessionStorage` is readable by any script on the page (XSS). It is used so a reload does not sign the
+  owner out. This is a shared-token proof of concept; the production step is Cognito or SSO.
+
 ## Product enquiry flow
 
 On `/products/:id` the **Enquire** button (`EnquirySection`) opens the form in a modal pop-up with the product

@@ -3,6 +3,8 @@ export enum RoutePath {
   CATEGORY = '/category/:category',
   SEARCH = '/search',
   PRODUCT = '/products/:id',
+  // Deliberately not linked anywhere in the UI. The API enforces the access, not the missing link.
+  ADMIN = '/admin',
   NOT_FOUND = '*',
 }
 
@@ -20,4 +22,5 @@ export enum ApiPath {
   PRODUCTS = '/products',
   CATEGORIES = '/categories',
   ENQUIRIES = '/enquiries',
+  ADMIN_ENQUIRIES = '/admin/enquiries',
 }

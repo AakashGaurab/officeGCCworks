@@ -55,6 +55,14 @@ describe('Header search', () => {
   });
 });
 
+describe('Header admin link', () => {
+  it('does not link to the admin page', () => {
+    renderHeader();
+
+    expect(screen.queryAllByRole('link').some((link) => link.getAttribute('href')?.startsWith('/admin'))).toBe(false);
+  });
+});
+
 describe('Header categories error', () => {
   it('shows no retry when categories loaded', () => {
     renderHeader();

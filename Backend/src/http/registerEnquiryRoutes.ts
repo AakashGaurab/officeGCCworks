@@ -1,4 +1,3 @@
-import rateLimit from '@fastify/rate-limit';
 import type { FastifyInstance } from 'fastify';
 import type { EnquiryService } from '../application/EnquiryService.js';
 import {
@@ -7,8 +6,6 @@ import {
   ENQUIRY_RATE_LIMIT_WINDOW_MS,
   HTTP_STATUS,
 } from '../config/constants.js';
-import { ErrorMessage } from './ErrorCode.js';
-import { RateLimitError } from './RateLimitError.js';
 import { enquiryBodySchema } from './requestSchemas.js';
 
 export enum EnquiryRoutePath {
@@ -29,12 +26,6 @@ export const registerEnquiryRoutes = async (
   app: FastifyInstance,
   service: EnquiryService,
 ): Promise<void> => {
-  // global: false, so only routes with a rateLimit config are limited.
-  await app.register(rateLimit, {
-    global: false,
-    errorResponseBuilder: () => new RateLimitError(ErrorMessage.RATE_LIMITED),
-  });
-
   app.post(EnquiryRoutePath.ENQUIRIES, ROUTE_OPTIONS, async (request, reply) => {
     const { id } = await service.submit(enquiryBodySchema.parse(request.body));
     return reply.status(HTTP_STATUS.CREATED).send({ id, status: EnquiryReceiptStatus.RECEIVED });

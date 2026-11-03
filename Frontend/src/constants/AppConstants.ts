@@ -15,6 +15,7 @@ export const FOCUS_HEADING_SELECTOR = 'h2';
 
 export const HTTP_STATUS = {
   BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
   NOT_FOUND: 404,
   TOO_MANY_REQUESTS: 429,
 } as const;
@@ -55,6 +56,7 @@ export const HEADING_TAB_INDEX = -1;
 
 export enum InputType {
   TEXT = 'text',
+  PASSWORD = 'password',
   EMAIL = 'email',
   TEL = 'tel',
 }
@@ -64,4 +66,24 @@ export enum AutoComplete {
   EMAIL = 'email',
   TEL = 'tel',
   OFF = 'off',
+  CURRENT_PASSWORD = 'current-password',
+}
+
+// Admin page. The list page size matches the backend default; sign-in only needs proof that the token works.
+export const ADMIN_PAGE_SIZE = 20;
+export const ADMIN_VERIFY_PAGE_SIZE = 1;
+export const ADMIN_TOKEN_STORAGE_KEY = 'admin-token';
+export const ADMIN_TOKEN_INPUT_ID = 'admin-token';
+export const AUTHORIZATION_HEADER = 'Authorization';
+export const BEARER_PREFIX = 'Bearer ';
+export const ALL_STATUSES_KEY = 'all';
+export const INITIAL_REFRESH_COUNT = 0;
+export const MAILTO_PREFIX = 'mailto:';
+export const ADMIN_DATE_FORMAT: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'short' };
+
+// Same values as the backend EnquiryStatus.
+export enum EnquiryStatus {
+  PENDING = 'pending',
+  SENT = 'sent',
+  FAILED = 'failed',
 }

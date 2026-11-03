@@ -1,0 +1,22 @@
+.enquiry-status-badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+}
+
+.enquiry-status-pending {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.enquiry-status-sent {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.enquiry-status-failed {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
