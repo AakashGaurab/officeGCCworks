@@ -23,20 +23,72 @@ const fillValidForm = async (user: ReturnType<typeof userEvent.setup>) => {
 };
 
 describe('EnquirySection', () => {
-  it('shows the form only after clicking Enquire and hides it on a second click', async () => {
+  it('opens the form in a modal dialog only after clicking Enquire', async () => {
     const user = userEvent.setup();
     render(<EnquirySection product={product} />);
     const enquireButton = screen.getByRole('button', { name: 'Enquire' });
 
+    expect(enquireButton).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /Enquire about/ })).not.toBeInTheDocument();
-    expect(enquireButton).toHaveAttribute('aria-expanded', 'false');
 
     await user.click(enquireButton);
-    expect(screen.getByRole('heading', { name: 'Enquire about Blue Shirt' })).toBeInTheDocument();
-    expect(enquireButton).toHaveAttribute('aria-expanded', 'true');
 
-    await user.click(enquireButton);
-    expect(screen.queryByRole('heading', { name: /Enquire about/ })).not.toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: 'Enquire about Blue Shirt' });
+    expect(dialog).toContainElement(screen.getByRole('heading', { name: 'Enquire about Blue Shirt' }));
+    expect(dialog).toContainElement(screen.getByLabelText('Name'));
+  });
+
+  it('closes with the Close button', async () => {
+    const user = await renderOpenForm();
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
+  });
+
+  it('closes when the dimmed area behind the dialog is clicked, but not when the form is clicked', async () => {
+    const user = await renderOpenForm();
+
+    await user.click(screen.getByLabelText('Name'));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('dialog'));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('closes when the browser closes the dialog, for example with the Esc key', async () => {
+    await renderOpenForm();
+
+    // The browser fires "close" on the dialog when Esc is pressed.
+    fireEvent(screen.getByRole('dialog'), new Event('close'));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('keeps a half-written form when the modal is closed and reopened', async () => {
+    const user = await renderOpenForm();
+    await user.type(screen.getByLabelText('Name'), 'Ada');
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    await user.click(screen.getByRole('button', { name: 'Enquire' }));
+
+    expect(screen.getByLabelText('Name')).toHaveValue('Ada');
+  });
+
+  it('starts with a fresh form after a successful send is closed', async () => {
+    vi.mocked(enquiryApi.submitEnquiry).mockResolvedValue({ id: 'abc', status: 'received' });
+    const user = await renderOpenForm();
+    await fillValidForm(user);
+    await user.click(screen.getByRole('button', { name: 'Send enquiry' }));
+    await screen.findByRole('heading', { name: 'Thank you' });
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await user.click(screen.getByRole('button', { name: 'Enquire' }));
+
+    expect(screen.queryByRole('heading', { name: 'Thank you' })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toHaveValue('');
   });
 
   it('has a hidden honeypot field that is skipped by keyboard and assistive technology', async () => {
@@ -177,16 +229,6 @@ describe('EnquirySection', () => {
     await user.click(screen.getByRole('button', { name: 'Send enquiry' }));
 
     await waitFor(() => expect(status).toHaveTextContent('Your enquiry was sent.'));
-  });
-
-  it('always has the element that aria-controls points to', async () => {
-    render(<EnquirySection product={product} />);
-    const button = screen.getByRole('button', { name: 'Enquire' });
-    const panelId = button.getAttribute('aria-controls') ?? '';
-
-    expect(document.getElementById(panelId)).toBeInTheDocument();
-    await userEvent.setup().click(button);
-    expect(document.getElementById(panelId)).toContainElement(screen.getByLabelText('Name'));
   });
 
   it('sends only once when the form is submitted twice while sending', async () => {

@@ -46,7 +46,6 @@ export const ENQUIRY_PHONE_PATTERN = /^[\d\s+\-()]+$/;
 export const ENQUIRY_EMAIL_PATTERN =
   /^(?:[A-Za-z0-9_'+-]+\.)*[A-Za-z0-9_'+-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9-]*\.)+[A-Za-z]{2,}$/;
 export const ENQUIRY_FORM_ID = 'enquiry-form';
-export const ENQUIRY_PANEL_ID = 'enquiry-panel';
 export const FIRST_ITEM_INDEX = 0;
 export const ENQUIRY_FIELD_ID_PREFIX = 'enquiry-';
 export const ERROR_ID_SUFFIX = '-error';

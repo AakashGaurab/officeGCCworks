@@ -80,8 +80,11 @@ variables used by every component stylesheet.
 
 ## Product enquiry flow
 
-On `/products/:id` the **Enquire** button (`EnquirySection`) opens an inline form with the product title in
-its heading (no modal).
+On `/products/:id` the **Enquire** button (`EnquirySection`) opens the form in a modal pop-up with the product
+title in its heading. The pop-up (`components/Modal.tsx`) is built on the browser's native `<dialog>` element,
+which provides the dimmed backdrop, Esc to close, keyboard focus kept inside, and focus returned to the
+Enquire button on close. It also closes with the Close button or a click on the backdrop. A half-written form
+is kept if the pop-up is closed; after a successful send it starts fresh next time.
 
 1. Fields: name, email, phone (optional) and message. Validation (`utils/validateEnquiry.ts`) mirrors the
    backend rules. A field's error shows when the user leaves it, all errors show on submit, and focus moves
