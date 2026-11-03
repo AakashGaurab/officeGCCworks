@@ -128,6 +128,18 @@ describe('EnquirySection', () => {
     expect(email).toHaveAttribute('aria-invalid', 'false');
   });
 
+  it('does not flag an empty field just because it was focused and left', async () => {
+    const user = await renderOpenForm();
+    expect(screen.getByLabelText('Name')).toHaveFocus();
+
+    await user.click(screen.getByLabelText('Email'));
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await user.click(screen.getByRole('button', { name: 'Enquire' }));
+
+    expect(screen.queryByText('Enter your name.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Enter your email address.')).not.toBeInTheDocument();
+  });
+
   it('shows an error for an invalid optional phone number', async () => {
     const user = await renderOpenForm();
     await user.type(screen.getByLabelText('Phone (optional)'), 'abc');
@@ -203,9 +215,9 @@ describe('EnquirySection', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(pattern));
   });
 
-  it('moves focus to the form heading when the panel opens', async () => {
+  it('puts the cursor in the Name field when the modal opens', async () => {
     await renderOpenForm();
-    expect(screen.getByRole('heading', { name: 'Enquire about Blue Shirt' })).toHaveFocus();
+    expect(screen.getByLabelText('Name')).toHaveFocus();
   });
 
   it('moves focus to the Thank you heading after a successful send', async () => {

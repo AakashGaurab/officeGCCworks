@@ -14,8 +14,8 @@ const INITIAL_VALUES: EnquiryValues = {
   [EnquiryField.WEBSITE]: '',
 };
 
-// Holds the field values and decides which errors to show: a field's error appears after it was
-// left (blur), and every error appears after a submit attempt.
+// Holds the field values and decides which errors to show: a field's error appears after something was
+// typed in it and it was left (blur), and every error appears after a submit attempt.
 export const useEnquiryForm = () => {
   const [values, setValues] = useState<EnquiryValues>(INITIAL_VALUES);
   const [touchedFields, setTouchedFields] = useState<TouchedFields>({});
@@ -27,7 +27,10 @@ export const useEnquiryForm = () => {
   };
 
   const handleFieldBlur = (event: FocusEvent<FieldElement>) => {
-    const { name } = event.target;
+    const { name, value } = event.target;
+    // The first field is focused automatically when the modal opens. Leaving an empty field must not
+    // scold the visitor for something they never started; empty required fields are flagged on submit.
+    if (!value) return;
     setTouchedFields((previous) => ({ ...previous, [name]: true }));
   };
 

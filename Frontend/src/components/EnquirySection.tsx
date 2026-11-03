@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { EnquiryText } from '../constants/Text';
+import { EnquiryField, EnquiryText } from '../constants/Text';
 import { SubmitStatus, useSubmitEnquiry } from '../hooks/useSubmitEnquiry';
 import { useEnquiryForm } from '../hooks/useEnquiryForm';
 import type { Product } from '../types/Product';
@@ -21,9 +21,12 @@ const EnquirySection = ({ product }: EnquirySectionProps) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const isSuccess = status === SubmitStatus.SUCCESS;
 
-  // Focus the new heading when the panel opens and when the thank-you replaces the form (and back).
+  // When the pop-up opens, put the cursor in the first field so the visitor can start typing straight away.
+  // When the thank-you replaces the form, focus its heading so screen readers read it out.
   useEffect(() => {
-    if (isOpen) focusPanelHeading(panelRef.current);
+    if (!isOpen) return;
+    if (isSuccess) focusPanelHeading(panelRef.current);
+    else focusFormField(formRef.current, EnquiryField.NAME);
   }, [isOpen, isSuccess]);
 
   const handleEnquireClick = () => setIsOpen(true);

@@ -7,7 +7,11 @@ type EnquiryThanksProps = {
 };
 
 const EnquiryThanks = ({ onSendAnother }: EnquiryThanksProps) => (
-  <section className="enquiry-form">
+  <section className="enquiry-thanks">
+    {/* Decorative: the heading below already says "Thank you". */}
+    <div className="enquiry-thanks-icon" aria-hidden="true">
+      &#10003;
+    </div>
     <h2 tabIndex={HEADING_TAB_INDEX}>{EnquiryText.THANKS_TITLE}</h2>
     <p>{EnquiryText.THANKS_MESSAGE}</p>
     <button className="button" type="button" onClick={onSendAnother}>
