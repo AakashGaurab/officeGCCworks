@@ -42,14 +42,16 @@ Category names such as `men's clothing` are encoded with `encodeURIComponent` wh
 
 ```
 src/
-  api/         apiClient (fetch + ApiError) and catalogueApi (one function per endpoint)
+  api/         apiClient (fetch + ApiError), catalogueApi and enquiryApi (one function per endpoint)
   types/       Product, Category, Paginated types matching the backend
   constants/   AppConstants (numbers), Routes (paths, params), Text (all UI strings as enums)
   hooks/       Data hooks: useFetch, useFeaturedProducts, useCategories, useProduct,
                useInfiniteProducts (generic paging), useCategoryProducts, useSearchProducts,
-               useInfiniteScroll (IntersectionObserver sentinel)
+               useInfiniteScroll (IntersectionObserver sentinel), useEnquiryForm (field values and
+               which errors to show), useSubmitEnquiry (idle/submitting/success/error)
   components/  Presentational building blocks (Layout, Header, SearchBar, ProductCard, ProductGrid,
-               StarRating, ProductImage, LoadingState, EmptyState, ErrorState, ErrorBoundary, ...)
+               StarRating, ProductImage, LoadingState, EmptyState, ErrorState, ErrorBoundary,
+               EnquirySection (container), EnquiryForm, EnquiryThanks, FormField, ...)
   pages/       One component per route; they only combine hooks and components
   utils/       Pure helpers (price formatting, route paths, ...)
   styles/      theme.css (design tokens) and base.css (global rules)
@@ -76,7 +78,20 @@ Each component has its own `.css` file next to it, using only the variables from
 Edit only `src/styles/theme.css`: colours, fonts, spacing, radius, shadow and the focus ring are CSS
 variables used by every component stylesheet.
 
-## Not included yet
+## Product enquiry flow
 
-The Enquire action on the product page is marked with a comment in `ProductDetails.tsx` and arrives in a
-later change.
+On `/products/:id` the **Enquire** button (`EnquirySection`) opens an inline form with the product title in
+its heading (no modal).
+
+1. Fields: name, email, phone (optional) and message. Validation (`utils/validateEnquiry.ts`) mirrors the
+   backend rules. A field's error shows when the user leaves it, all errors show on submit, and focus moves
+   to the first invalid field. Errors are linked with `aria-describedby` and `aria-invalid`.
+2. A hidden `website` field (visually hidden, `aria-hidden`, not focusable) is a honeypot for bots. Real
+   users never fill it; the backend then ignores the enquiry.
+3. `useSubmitEnquiry` sends the data through `api/enquiryApi.ts`. While sending the button is disabled and
+   reads "Sending...".
+4. Success replaces the form with a "Thank you" message and a "Send another enquiry" button.
+5. Failure (network, 400, 429, 5xx) shows a friendly message in `role="alert"`. The typed input is kept, so
+   pressing "Send enquiry" again retries. Field errors from the server are shown as one general message.
+
+The email itself is sent by the Backend; the customer is only told the enquiry was received.

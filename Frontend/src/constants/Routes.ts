@@ -19,4 +19,5 @@ export enum ApiPath {
   FEATURED_PRODUCTS = '/products/featured',
   PRODUCTS = '/products',
   CATEGORIES = '/categories',
+  ENQUIRIES = '/enquiries',
 }

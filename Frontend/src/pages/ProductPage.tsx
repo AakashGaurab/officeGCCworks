@@ -26,7 +26,8 @@ const ProductPage = () => {
     return <ErrorState onRetry={retry} />;
   };
 
-  if (product) return <ProductDetails product={product} />;
+  // key: a new product gets a fresh component tree, so enquiry form state cannot leak between products.
+  if (product) return <ProductDetails key={product.id} product={product} />;
 
   return (
     <>

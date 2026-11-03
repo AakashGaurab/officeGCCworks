@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify';
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildApp } from '../src/app.js';
 import type { ProductRepository } from '../src/domain/ProductRepository.js';
 import { UpstreamError } from '../src/domain/UpstreamError.js';
+import { buildTestApp, TEST_CORS_ORIGIN } from './helpers/buildTestApp.js';
 import { buildProduct } from './helpers/buildProduct.js';
 import { InMemoryProductRepository } from './helpers/InMemoryProductRepository.js';
 
-const CORS_ORIGIN = 'http://localhost:5173';
+const CORS_ORIGIN = TEST_CORS_ORIGIN;
 
 const products = Array.from({ length: 12 }, (_, index) =>
   buildProduct({
@@ -32,7 +32,7 @@ class FailingProductRepository implements ProductRepository {
 let app: FastifyInstance;
 
 const startApp = async (repository: ProductRepository = new InMemoryProductRepository(products)) => {
-  app = await buildApp({ productRepository: repository, corsOrigin: CORS_ORIGIN });
+  app = await buildTestApp({ productRepository: repository });
   return app;
 };
 

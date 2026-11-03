@@ -1,5 +1,16 @@
 import { z } from 'zod';
-import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from '../config/constants.js';
+import {
+  DEFAULT_PAGE,
+  CONTROL_CHARACTER_PATTERN,
+  DEFAULT_PAGE_SIZE,
+  ENQUIRY_HONEYPOT_MAX_LENGTH,
+  ENQUIRY_EMAIL_MAX_LENGTH,
+  ENQUIRY_MESSAGE_MAX_LENGTH,
+  ENQUIRY_NAME_MAX_LENGTH,
+  ENQUIRY_PHONE_MAX_LENGTH,
+  ENQUIRY_PHONE_MIN_LENGTH,
+  ENQUIRY_PHONE_PATTERN,
+} from '../config/constants.js';
 
 // Query values arrive as strings, so numbers are coerced and then checked.
 const positiveInt = z.coerce.number().int().positive();
@@ -21,3 +32,23 @@ export const categoryListingQuerySchema = z.object(paginationShape);
 export const categoryParamsSchema = z.object({ category: z.string().min(1) });
 
 export const productParamsSchema = z.object({ id: positiveInt });
+
+// Control characters (CR/LF included) are rejected in the name, which can reach an email header.
+// The email needs no extra check: z.email() already rejects them.
+const hasNoControlCharacters = (value: string) => !CONTROL_CHARACTER_PATTERN.test(value);
+
+export const enquiryBodySchema = z.object({
+  productId: positiveInt,
+  name: z.string().trim().min(1).max(ENQUIRY_NAME_MAX_LENGTH).refine(hasNoControlCharacters),
+  email: z.string().trim().max(ENQUIRY_EMAIL_MAX_LENGTH).pipe(z.email()),
+  phone: z
+    .string()
+    .trim()
+    .min(ENQUIRY_PHONE_MIN_LENGTH)
+    .max(ENQUIRY_PHONE_MAX_LENGTH)
+    .regex(ENQUIRY_PHONE_PATTERN)
+    .optional(),
+  message: z.string().trim().min(1).max(ENQUIRY_MESSAGE_MAX_LENGTH),
+  // Honeypot: hidden in the form, so only bots fill it in.
+  website: z.string().max(ENQUIRY_HONEYPOT_MAX_LENGTH).optional(),
+});

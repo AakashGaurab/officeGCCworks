@@ -73,6 +73,53 @@ export enum NotFoundText {
 export enum ApiErrorText {
   NETWORK = 'Could not reach the server',
   UNKNOWN = 'Unexpected response from the server',
+  TIMEOUT = 'The server took too long to answer',
   NETWORK_CODE = 'NETWORK_ERROR',
+  TIMEOUT_CODE = 'TIMEOUT_ERROR',
   UNKNOWN_CODE = 'UNKNOWN_ERROR',
+}
+
+export enum EnquiryField {
+  NAME = 'name',
+  EMAIL = 'email',
+  PHONE = 'phone',
+  MESSAGE = 'message',
+  WEBSITE = 'website',
+}
+
+export enum EnquiryText {
+  ENQUIRE_BUTTON = 'Enquire',
+  HEADING_PREFIX = 'Enquire about',
+  NAME_LABEL = 'Name',
+  EMAIL_LABEL = 'Email',
+  PHONE_LABEL = 'Phone (optional)',
+  MESSAGE_LABEL = 'Message',
+  HONEYPOT_LABEL = 'Leave this field empty',
+  SUBMIT = 'Send enquiry',
+  SUBMITTING = 'Sending...',
+  THANKS_TITLE = 'Thank you',
+  THANKS_ANNOUNCEMENT = 'Your enquiry was sent.',
+  THANKS_MESSAGE = 'Your enquiry has been received. Our sales team will be in touch soon.',
+  SEND_ANOTHER = 'Send another enquiry',
+}
+
+export enum EnquiryErrorText {
+  NAME_REQUIRED = 'Enter your name.',
+  EMAIL_REQUIRED = 'Enter your email address.',
+  EMAIL_INVALID = 'Enter a valid email address, for example name@example.com.',
+  PHONE_INVALID = 'Use only digits, spaces, + - and brackets.',
+  MESSAGE_REQUIRED = 'Enter your message.',
+  SUBMIT_FAILED = 'Your enquiry could not be sent. Your details are still here, please try again.',
+  SUBMIT_TIMEOUT = 'The server took too long to answer. Your details are still here, please try again.',
+  SUBMIT_NETWORK = 'We could not reach the server. Check your connection and try again.',
+  SUBMIT_RATE_LIMITED = 'You have sent several enquiries in a short time. Please wait a minute and try again.',
+  SUBMIT_INVALID = 'Some details were not accepted. Please check the form and try again.',
+}
+
+// Messages that contain a limit. {min} and {max} are filled from the constants (see enquiryLimitMessages).
+export enum EnquiryLimitTemplate {
+  NAME_TOO_LONG = 'Your name must be {max} characters or fewer.',
+  EMAIL_TOO_LONG = 'Your email address must be {max} characters or fewer.',
+  PHONE_LENGTH = 'A phone number must have {min} to {max} characters.',
+  MESSAGE_TOO_LONG = 'Your message must be {max} characters or fewer.',
 }
