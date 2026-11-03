@@ -1,0 +1,24 @@
+.product-details {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.product-details-image {
+  max-width: 28rem;
+}
+
+.product-details-category {
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.product-details-price {
+  font-size: var(--font-size-title);
+  font-weight: bold;
+}
+
+@media (min-width: 48rem) {
+  .product-details {
+    grid-template-columns: 1fr 1fr;
+  }
+}
