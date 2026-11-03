@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+.env
+*.sqlite
+*.sqlite-journal
+data/
+.DS_Store
+.claude/
+.vscode/
+standards/
