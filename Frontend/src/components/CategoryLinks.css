@@ -1,0 +1,24 @@
+.category-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.category-link {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  text-transform: capitalize;
+  text-decoration: none;
+}
+
+.site-header .category-links {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-3) var(--space-3);
+}
