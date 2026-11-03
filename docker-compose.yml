@@ -1,0 +1,36 @@
+# Runs the whole app locally: docker compose up --build
+#   Web app: http://localhost:5173      API: http://localhost:3001/api
+# Every setting has a default, so no .env file is needed. Copy .env.example to .env to override.
+services:
+  backend:
+    build: ./Backend
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      FAKE_STORE_API_BASE_URL: ${FAKE_STORE_API_BASE_URL:-https://fakestoreapi.com}
+      # Must match the address the browser uses for the web app.
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      SALES_INBOX_EMAIL: ${SALES_INBOX_EMAIL:-sales@example.com}
+      # log = write the email to the container log (no paid service needed).
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-log}
+      DATABASE_PATH: /app/data/enquiries.sqlite
+    volumes:
+      # Keeps saved enquiries when the container is recreated.
+      - enquiry-data:/app/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./Frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3001/api}
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  enquiry-data:
