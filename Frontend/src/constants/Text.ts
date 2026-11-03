@@ -87,6 +87,10 @@ export enum ApiErrorText {
   UNKNOWN_CODE = 'UNKNOWN_ERROR',
 }
 
+export enum ModalText {
+  CLOSE = 'Close',
+}
+
 export enum EnquiryField {
   NAME = 'name',
   EMAIL = 'email',

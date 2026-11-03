@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { ENQUIRY_PANEL_ID } from '../constants/AppConstants';
-import { EnquiryText } from '../constants/Text';
+import { EnquiryField, EnquiryText } from '../constants/Text';
 import { SubmitStatus, useSubmitEnquiry } from '../hooks/useSubmitEnquiry';
 import { useEnquiryForm } from '../hooks/useEnquiryForm';
 import type { Product } from '../types/Product';
 import { focusFormField, focusPanelHeading } from '../utils/focusFormField';
 import EnquiryForm from './EnquiryForm';
 import EnquiryThanks from './EnquiryThanks';
+import Modal from './Modal';
 
 type EnquirySectionProps = {
   product: Product;
@@ -21,12 +21,15 @@ const EnquirySection = ({ product }: EnquirySectionProps) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const isSuccess = status === SubmitStatus.SUCCESS;
 
-  // Focus the new heading when the panel opens and when the thank-you replaces the form (and back).
+  // When the pop-up opens, put the cursor in the first field so the visitor can start typing straight away.
+  // When the thank-you replaces the form, focus its heading so screen readers read it out.
   useEffect(() => {
-    if (isOpen) focusPanelHeading(panelRef.current);
+    if (!isOpen) return;
+    if (isSuccess) focusPanelHeading(panelRef.current);
+    else focusFormField(formRef.current, EnquiryField.NAME);
   }, [isOpen, isSuccess]);
 
-  const handleEnquireClick = () => setIsOpen((previous) => !previous);
+  const handleEnquireClick = () => setIsOpen(true);
 
   const handleEnquirySubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,6 +45,13 @@ const EnquirySection = ({ product }: EnquirySectionProps) => {
   const handleSendAnotherClick = () => {
     form.resetForm();
     reset();
+  };
+
+  // A half-written form is kept when the pop-up is closed, so closing by accident loses nothing.
+  // After a successful send there is nothing to keep, so the next opening starts fresh.
+  const handleModalClose = () => {
+    setIsOpen(false);
+    if (isSuccess) handleSendAnotherClick();
   };
 
   const renderPanel = () => {
@@ -63,23 +73,16 @@ const EnquirySection = ({ product }: EnquirySectionProps) => {
 
   return (
     <section>
-      <button
-        className="button"
-        type="button"
-        aria-expanded={isOpen}
-        aria-controls={ENQUIRY_PANEL_ID}
-        onClick={handleEnquireClick}
-      >
+      <button className="button" type="button" aria-haspopup="dialog" onClick={handleEnquireClick}>
         {EnquiryText.ENQUIRE_BUTTON}
       </button>
       {/* Always rendered: screen readers only announce changes inside a region that already exists. */}
       <p className="visually-hidden" role="status">
         {isSuccess ? EnquiryText.THANKS_ANNOUNCEMENT : ''}
       </p>
-      {/* Always rendered too, so aria-controls always points at an existing element. */}
-      <div id={ENQUIRY_PANEL_ID} ref={panelRef} hidden={!isOpen}>
-        {isOpen && renderPanel()}
-      </div>
+      <Modal isOpen={isOpen} label={`${EnquiryText.HEADING_PREFIX} ${product.title}`} onClose={handleModalClose}>
+        <div ref={panelRef}>{isOpen && renderPanel()}</div>
+      </Modal>
     </section>
   );
 };

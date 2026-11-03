@@ -2,6 +2,16 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 
+// jsdom has no <dialog>.showModal()/close(). This stand-in only toggles the `open` attribute, which is
+// enough for tests to see the dialog content; real focus trapping and Esc handling are the browser's job.
+HTMLDialogElement.prototype.showModal = function showModal() {
+  this.setAttribute('open', '');
+};
+HTMLDialogElement.prototype.close = function close() {
+  this.removeAttribute('open');
+  this.dispatchEvent(new Event('close'));
+};
+
 // jsdom has no IntersectionObserver; tests that need it install the fake from mockIntersectionObserver.ts.
 afterEach(() => {
   cleanup();
