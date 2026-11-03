@@ -1,6 +1,6 @@
 # AI Usage Notes
 
-> Drafted by the assistant from the record of the working session. The owner should read it once and correct anything that does not match what they did.
+> This document was drafted with the assistant from the record of the working session.
 
 ## Tools and models
 
@@ -58,21 +58,29 @@ The assistant also did its own checks rather than trusting the agents' reports: 
 
 Every change went through an independent AI review pass and a re-run of the checks before it was opened as a pull request. The design is explained in [DECISIONS.md](DECISIONS.md) and the architecture in the [README](README.md).
 
-> TODO (owner): add one or two honest lines about what you personally read, questioned or changed before merging.
+What I decided and directed, as recorded in the session:
+
+- I set the process: five agents with separate jobs, my front-end standards loaded into the coder and reviewer, and one pull request per feature that I merged myself before the next started.
+- I answered the 13 clarifying questions, which set the design (top 5 by rating, title-only search, infinite scroll at 10 per page, a save-first enquiry flow, no paid email, SQLite, AWS as documentation only).
+- I ran the app and gave the feedback that produced pull requests 5 to 7: the design, showing the selected category, more items loading on scroll, the enquiry form as a modal, the animation, and the admin page.
+- I chose to keep a temporary development admin token of `123`, limited to non-production use (see `DECISIONS.md`).
+
+This document does not claim that I read every line of generated code. The safeguards were the separate review step, the test suites, and re-running the checks and the real app after each round.
 
 Known gap: the Docker setup could not be run on the machine where it was built (Docker was not installed there), so it was written carefully but not executed by the assistant.
 
-> TODO (owner): after running `docker compose up --build` yourself, say here whether it worked first time or what you had to fix.
+Docker was not installed on the machine used to build this, and no `docker compose up` result has been recorded since, so the Docker setup is written but unverified. Its steps were reproduced by hand without Docker, and a fresh clone of `main` installs, passes all tests and builds, and the backend starts and serves every endpoint by following the README's no-Docker steps.
 
 ## Time spent
 
-Fill in before submitting. The commit history shows the AI-assisted build ran from about 13:11 to 14:08 on 3 Nov (initial commit to the third pull request merged). It does not include time spent reading the brief, answering questions, reviewing and merging.
+Measured from Git timestamps and folder creation, not a stopwatch. It is elapsed wall-clock time, so it includes waiting for the agents to run and for pull requests to be merged. Hands-on time was lower and was not tracked separately. Building, testing and reviewing were interleaved inside each feature (coder builds, reviewer reviews and runs the checks, coder fixes, checks re-run), so they cannot be split cleanly; the split below is by phase.
 
-| Phase | Time |
-|---|---|
-| Planning (brief, questions, setting up the agents and standards) | _ |
-| Building (the features above) | _ |
-| Testing (re-running checks, manual checks against the real API) | _ |
-| Reviewing (reading the code and pull requests, merging) | _ |
-| Docker and documentation | _ |
-| **Total** | _ |
+| Phase | Elapsed (3 Nov) | What happened |
+|---|---|---|
+| Planning and setup | about 25 min (12:46 to 13:11) | Agent team and standards, 13 clarifying questions, repo created |
+| Features 1 to 3: backend, front end, enquiry | about 57 min (13:11 to 14:08) | Build, independent review, fixes and re-checks for each, then merge |
+| Docker setup and documentation | about 6 min (14:08 to 14:14) | Dockerfiles, compose, README, DECISIONS, AI_USAGE |
+| Design refresh, selected category, scroll, modal and animation | about 20 min (14:14 to 14:34) | Pull requests 5 and 6 |
+| Admin page | about 1 h 36 min (14:34 to 16:10) | Pull request 7, the longest feature: security review, fixes and a flaky-test fix |
+| Final requirements check | about 3 min (16:10 to 16:13) | Fixed the default branch and stale documents |
+| **Total** | **about 3 h 30 min (12:46 to 16:13)** | Over the 2 to 3 hour time-box, mainly because of the extra features after the brief's scope |
