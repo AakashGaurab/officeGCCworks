@@ -6,6 +6,5 @@ coverage/
 *.sqlite-journal
 data/
 .DS_Store
-.claude/
 .vscode/
 standards/
